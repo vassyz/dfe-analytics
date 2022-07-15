@@ -4,6 +4,7 @@ require 'request_store_rails'
 require 'i18n'
 require 'dfe/analytics/event_schema'
 require 'dfe/analytics/fields'
+require 'dfe/analytics/entity_callbacks'
 require 'dfe/analytics/entities'
 require 'dfe/analytics/event'
 require 'dfe/analytics/analytics_job'
@@ -17,6 +18,8 @@ require 'dfe/analytics/railtie'
 
 module DfE
   module Analytics
+    @initialized = false
+
     def self.events_client
       @events_client ||= begin
         require 'google/cloud/bigquery'
@@ -72,6 +75,19 @@ module DfE
       config.log_only              ||= false
       config.async                 ||= true
       config.queue                 ||= :default
+
+      initialize!
+    end
+
+    def self.initialize!
+      return false if @initialized
+
+      # entities_for_analytics.each do |entity|
+      #   klass = model_for_entity(entity)
+      #   klass.include(DfE::Analytics::EntityCallbacks) unless klass.include?(DfE::Analytics::Entities)
+      # end
+      #
+      @initialized = true
     end
 
     def self.enabled?

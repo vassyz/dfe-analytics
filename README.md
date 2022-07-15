@@ -340,11 +340,7 @@ end
 
 ##### Models
 
-```ruby
-class ApplicationRecord < ActiveRecord::Base
-  include DfE::Analytics::Entities
-end
-```
+Adding a table name to `analytics.yml` will cause changes to be sent to BigQuery.
 
 If everything has worked, you should see jobs flowing into your queues on each
 web request and model update. While you’re setting things up consider setting
