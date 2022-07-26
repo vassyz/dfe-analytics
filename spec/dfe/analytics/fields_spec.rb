@@ -28,6 +28,12 @@ RSpec.describe DfE::Analytics::Fields do
         expect(fields).not_to include('email_address')
         expect(fields).not_to include('id')
       end
+
+      describe '.check!' do
+        it 'raises an error' do
+          expect { DfE::Analytics::Fields.check! }.to raise_error(DfE::Analytics::ConfigurationError, /New database field detected/)
+        end
+      end
     end
 
     describe '.conflicting_fields' do
@@ -39,6 +45,12 @@ RSpec.describe DfE::Analytics::Fields do
           conflicts = described_class.conflicting_fields
           expect(conflicts.keys).to eq(%i[candidates])
           expect(conflicts[:candidates]).to eq(%w[email_address first_name])
+        end
+
+        describe '.check!' do
+          it 'raises an error' do
+            expect { DfE::Analytics::Fields.check! }.to raise_error(DfE::Analytics::ConfigurationError, /Conflict detected/)
+          end
         end
       end
 
@@ -77,6 +89,12 @@ RSpec.describe DfE::Analytics::Fields do
         it 'returns the field that has been removed' do
           fields = described_class.surplus_fields[:candidates]
           expect(fields).to eq ['some_removed_field']
+        end
+      end
+
+      describe '.check!' do
+        it 'raises an error' do
+          expect { DfE::Analytics::Fields.check! }.to raise_error(DfE::Analytics::ConfigurationError, /Database field removed/)
         end
       end
     end
