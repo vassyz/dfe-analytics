@@ -34,11 +34,18 @@ RSpec.describe DfE::Analytics::Entities do
     allow(DfE::Analytics).to receive(:allowlist_pii).and_return({
       candidates: pii_fields
     })
+
+    # autogenerate a compliant blocklist
+    blocklist = DfE::Analytics::Fields.database
+    blocklist[:candidates] = blocklist[:candidates] - interesting_fields
+    allow(DfE::Analytics).to receive(:blocklist).and_return(blocklist)
+
+    DfE::Analytics.initialize!
   end
 
   describe 'create_entity events' do
     context 'when fields are specified in the analytics file' do
-      let(:interesting_fields) { [:id] }
+      let(:interesting_fields) { ["id"] }
 
       it 'includes attributes specified in the settings file' do
         model.create(id: 123)
@@ -90,8 +97,8 @@ RSpec.describe DfE::Analytics::Entities do
       end
 
       context 'and the specified fields are listed as PII' do
-        let(:interesting_fields) { [:email_address] }
-        let(:pii_fields) { [:email_address] }
+        let(:interesting_fields) { ["email_address"] }
+        let(:pii_fields) { ["email_address"] }
 
         it 'hashes those fields' do
           model.create(email_address: 'adrienne@example.com')
@@ -107,8 +114,8 @@ RSpec.describe DfE::Analytics::Entities do
       end
 
       context 'and other fields are listed as PII' do
-        let(:interesting_fields) { [:id] }
-        let(:pii_fields) { [:email_address] }
+        let(:interesting_fields) { ["id"] }
+        let(:pii_fields) { ["email_address"] }
 
         it 'does not include the fields only listed as PII' do
           model.create(id: 123, email_address: 'adrienne@example.com')
@@ -137,7 +144,7 @@ RSpec.describe DfE::Analytics::Entities do
 
   describe 'update_entity events' do
     context 'when fields are specified in the analytics file' do
-      let(:interesting_fields) { %i[email_address first_name] }
+      let(:interesting_fields) { %w[email_address first_name] }
 
       it 'sends update events for fields we care about' do
         entity = model.create(email_address: 'foo@bar.com', first_name: 'Jason')
@@ -193,7 +200,7 @@ RSpec.describe DfE::Analytics::Entities do
   end
 
   describe 'delete_entity events' do
-    let(:interesting_fields) { [:email_address] }
+    let(:interesting_fields) { ["email_address"] }
 
     it 'sends events when objects are deleted' do
       entity = model.create(email_address: 'boo@example.com')
