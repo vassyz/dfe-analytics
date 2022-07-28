@@ -32,6 +32,10 @@ RSpec.configure do |config|
   # Disable RSpec exposing methods globally on `Module` and `main`
   config.disable_monkey_patching!
 
+  config.before do
+    DfE::Analytics.instance_variable_set(:@events_client, nil)
+  end
+
   config.expect_with :rspec do |c|
     c.syntax = :expect
   end
