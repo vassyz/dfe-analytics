@@ -109,7 +109,7 @@ module DfE
     end
 
     def self.entities_for_analytics
-      allowlist.keys & all_entities_in_application
+      allowlist.keys
     end
 
     def self.all_entities_in_application
