@@ -30,7 +30,7 @@ RSpec.describe DfE::Analytics::LoadEntities do
 
     described_class.new(entity_name: 'candidates').run
 
-    expect(DfE::Analytics::SendEvents).to have_received(:perform_later) do |payload|
+    expect(DfE::Analytics::SendEvents).to have_received(:perform_later).twice do |payload|
       schema = DfE::Analytics::EventSchema.new.as_json
       schema_validator = JSONSchemaValidator.new(schema, payload.first)
 
@@ -48,6 +48,6 @@ RSpec.describe DfE::Analytics::LoadEntities do
 
     described_class.new(entity_name: 'candidates', batch_size: 2).run
 
-    expect(DfE::Analytics::SendEvents).to have_received(:perform_later).once
+    expect(DfE::Analytics::SendEvents).to have_received(:perform_later).exactly(3).times
   end
 end

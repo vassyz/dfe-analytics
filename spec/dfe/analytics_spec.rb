@@ -32,6 +32,48 @@ RSpec.describe DfE::Analytics do
         expect { DfE::Analytics.initialize! }.to raise_error(DfE::Analytics::ConfigurationError)
       end
     end
+
+    context 'when a model has not included DfE::Analytics::Entities', suppress_init: true do
+      it 'includes it' do
+        c = Class.new(Candidate)
+
+        expect(c.include?(DfE::Analytics::Entities)).to be false
+
+        DfE::Analytics.initialize!
+
+        expect(c.include?(DfE::Analytics::Entities)).to be true
+      end
+    end
+
+    context 'when models have already included DfE::Analytics::Entities', suppress_init: true do
+      it 'logs a deprecation warning' do
+        Class.new(Candidate) do
+          include DfE::Analytics::Entities
+        end
+
+        allow(Rails.logger).to receive(:info).and_call_original
+
+        DfE::Analytics.initialize!
+
+        expect(Rails.logger).to have_received(:info).once.with(/DEPRECATION WARNING/)
+      end
+
+      it 'logs only one deprecation warning' do
+        Class.new(Candidate) do
+          include DfE::Analytics::Entities
+        end
+
+        Class.new(School) do
+          include DfE::Analytics::Entities
+        end
+
+        allow(Rails.logger).to receive(:info).and_call_original
+
+        DfE::Analytics.initialize!
+
+        expect(Rails.logger).to have_received(:info).once.with(/DEPRECATION WARNING/)
+      end
+    end
   end
 
   it 'raises a configuration error on missing config values' do

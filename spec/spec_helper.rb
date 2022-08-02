@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 ENV['RAILS_ENV'] = 'test'
+ENV['SUPPRESS_DFE_ANALYTICS_INIT'] = 'true'
+
 require_relative '../spec/dummy/config/environment'
 require 'debug'
 require 'rspec/rails'
@@ -31,6 +33,15 @@ RSpec.configure do |config|
 
   # Disable RSpec exposing methods globally on `Module` and `main`
   config.disable_monkey_patching!
+
+  config.define_derived_metadata do |metadata|
+    metadata[:suppress_init] = false unless metadata[:suppress_init] == true
+  end
+
+  config.around suppress_init: false do |example|
+    DfE::Analytics.initialize!
+    example.run
+  end
 
   config.before do
     DfE::Analytics.instance_variable_set(:@events_client, nil)
