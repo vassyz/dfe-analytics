@@ -14,9 +14,11 @@ module DfE
       end
 
       config.after_initialize do
-        # internal gem tests will sometimes suppress this so they can test the
-        # init process
-        DfE::Analytics.initialize! unless ENV['SUPPRESS_DFE_ANALYTICS_INIT']
+        ActiveSupport.on_load(:active_record) do
+          # internal gem tests will sometimes suppress this so they can test the
+          # init process
+          DfE::Analytics.initialize! unless ENV['SUPPRESS_DFE_ANALYTICS_INIT']
+        end
       end
 
       rake_tasks do
