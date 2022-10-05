@@ -13,6 +13,7 @@ require 'dfe/analytics/load_entity_batch'
 require 'dfe/analytics/requests'
 require 'dfe/analytics/version'
 require 'dfe/analytics/middleware/request_identity'
+require 'dfe/analytics/emails'
 require 'dfe/analytics/railtie'
 
 module DfE
@@ -79,6 +80,10 @@ module DfE
     end
 
     def self.initialize!
+      if defined?(ApplicationMailer)
+        ApplicationMailer.include(DfE::Analytics::Emails)
+      end
+
       unless defined?(ActiveRecord)
         # bail if we don't have AR at all
         Rails.logger.info('ActiveRecord not loaded; DfE Analytics not initialized')

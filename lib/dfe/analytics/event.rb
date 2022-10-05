@@ -5,7 +5,7 @@ require 'active_support/values/time_zone'
 module DfE
   module Analytics
     class Event
-      EVENT_TYPES = %w[web_request create_entity update_entity delete_entity import_entity].freeze
+      EVENT_TYPES = %w[web_request create_entity update_entity delete_entity import_entity email].freeze
 
       def initialize
         time_zone = 'London'
